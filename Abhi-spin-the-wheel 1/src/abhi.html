@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fruit Spin Wheel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 50px;
+      background: #f2f2f2;
+    }
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+    }
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid #333;
+      box-sizing: border-box;
+      position: relative;
+      transition: transform 5s ease-out;
+    }
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid red;
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .fruit-name {
+      margin-top: 30px;
+      font-size: 24px;
+      font-weight: bold;
+      color: green;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wheel-container">
+    <div class="pointer"></div>
+    <canvas id="wheelCanvas" width="300" height="300"></canvas>
+  </div>
+  <button onclick="spinWheel()">Spin</button>
+  <div class="fruit-name" id="result"></div>
+
+  <script>
+    const fruits = [
+      "Apple", "Banana", "Mango", "Grapes", "Pineapple",
+      "Orange", "Strawberry", "Watermelon", "Kiwi", "Cherry"
+    ];
+
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+    const radius = canvas.width / 2;
+    const anglePerSlice = (2 * Math.PI) / fruits.length;
+
+    function drawWheel() {
+      for (let i = 0; i < fruits.length; i++) {
+        const angle = i * anglePerSlice;
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, angle, angle + anglePerSlice);
+        ctx.fillStyle = i % 2 === 0 ? "#FFD700" : "#ADFF2F";
+        ctx.fill();
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(angle + anglePerSlice / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#000";
+        ctx.font = "14px Arial";
+        ctx.fillText(fruits[i], radius - 10, 5);
+        ctx.restore();
+      }
+    }
+
+    drawWheel();
+
+    let currentAngle = 0;
+
+    function spinWheel() {
+      const resultDiv = document.getElementById("result");
+      resultDiv.textContent = "";
+
+      const spins = Math.floor(Math.random() * 5) + 5;
+      const selectedIndex = Math.floor(Math.random() * fruits.length);
+      const finalAngle = (360 / fruits.length) * selectedIndex;
+      const totalAngle = (spins * 360) + finalAngle;
+
+      const wheel = document.querySelector(".wheel");
+      canvas.style.transition = "transform 5s ease-out";
+      currentAngle += totalAngle;
+      canvas.style.transform = `rotate(${currentAngle}deg)`;
+
+      setTimeout(() => {
+        const fruit = fruits[fruits.length - 1 - selectedIndex];
+        resultDiv.textContent = "Selected Fruit: " + fruit;
+        setTimeout(() => {
+          resultDiv.textContent = "";
+        }, 10000);
+      }, 5000);
+    }
+  </script>
+
+</body>
+</html>
